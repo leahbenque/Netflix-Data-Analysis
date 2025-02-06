@@ -14,7 +14,7 @@ app.layout = html.Div(
     style={'background-color': '#ffcccb'},  # Ensures background is visible
     children=[
         dmc.Container([
-            dmc.Title('Netflix Data Dashboard', color="red"),
+            dmc.Title('Netflix Data Dashboard', c="red"),
             
             # Dropdown 
             dmc.Select(
