@@ -7,4 +7,4 @@ In this analysis, I investigate Netflix/IMDB data of movies uploaded to the plat
 
   The data was retrieved from [Kaggle](https://www.kaggle.com/datasets/luiscorter/netflix-original-films-imdb-scores)
 
-[![Dashboard Available Here](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)]([https://<your-custom-subdomain>.streamlit.app](https://netflix-data-analysis-gx6g3sva7jyyfmtyihe4cf.streamlit.app/))
+Dashboard Available [here](https://netflix-data-analysis-gx6g3sva7jyyfmtyihe4cf.streamlit.app/)
