@@ -1,111 +1,81 @@
 import pandas as pd
 import plotly.express as px
-from dash import Dash, dash_table, dcc, callback, Output, Input, html
-import dash_mantine_components as dmc
-import dash_bootstrap_components as dbc
+import streamlit as st
 
 # Load dataset
 n_topten = pd.read_csv('netflixtopten.csv')
 
-# Create Dash app
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+# Streamlit App Configuration
+st.set_page_config(page_title="Netflix Data Dashboard", layout="wide")
 
-# Layout
-app.layout = dmc.Container(
-    [
-        dmc.Title("Netflix Data Dashboard", c="red"),
+# Title
+st.title("📊 Netflix Data Dashboard")
 
-        # Dropdown
-        dmc.Select(
-            label="Select Genre",
-            id="genre-dropdown",
-            value="All Genres",
-            data=[{"value": "All Genres", "label": "All Genres"}]
-            + [{"value": genre, "label": genre} for genre in sorted(n_topten["Genre"].unique())],
-        ),
-
-        # Grid Layout for Graphs
-        dmc.Grid(
-            [
-                dmc.Grid.Col(dcc.Graph(figure={}, id="scatter-graph"), span=6),
-                dmc.Grid.Col(dcc.Graph(figure={}, id="histogram-graph"), span=6),
-                dmc.Grid.Col(dcc.Graph(figure={}, id="barchart-graph"), span=6),
-                dmc.Grid.Col(dcc.Graph(figure={}, id="boxplot-graph"), span=6),
-            ]
-        ),
-
-        # Data Table
-        dmc.Grid(
-            [
-                dmc.Grid.Col(
-                    dash_table.DataTable(data=n_topten.to_dict("records"), page_size=8),
-                    span=12,
-                ),
-            ]
-        ),
-    ],
-    fluid=True,
+# Sidebar for Genre Selection
+st.sidebar.header("Filter Options")
+selected_genre = st.sidebar.selectbox(
+    "Select Genre", 
+    ["All Genres"] + sorted(n_topten["Genre"].unique())
 )
 
-# Callback to update graphs
-@callback(
-    [
-        Output("scatter-graph", "figure"),
-        Output("histogram-graph", "figure"),
-        Output("barchart-graph", "figure"),
-        Output("boxplot-graph", "figure"),
-    ],
-    Input("genre-dropdown", "value"),
-)
-def update_graphs(selected_genre):
-    # Filter data based on the selected genre
-    filtered_data = n_topten if selected_genre == "All Genres" else n_topten[n_topten["Genre"] == selected_genre]
+# Filter the data based on selected genre
+filtered_data = n_topten if selected_genre == "All Genres" else n_topten[n_topten["Genre"] == selected_genre]
 
-    # Scatter Plot
+# Layout for graphs
+col1, col2 = st.columns(2)
+
+# Scatter Plot
+with col1:
+    st.subheader(f"IMDB Score vs Runtime for {selected_genre} Movies")
     scatter_fig = px.scatter(
         filtered_data,
         x="Runtime",
         y="IMDB Score",
         color="Genre",
         hover_data=["Title", "Premiere"],
-        title=f"IMDB Score vs Runtime for {selected_genre} Movies",
         color_discrete_sequence=px.colors.qualitative.Pastel,
     )
     scatter_fig.update_traces(showlegend=False)
+    st.plotly_chart(scatter_fig, use_container_width=True)
 
-    # Histogram
+# Histogram
+with col2:
+    st.subheader(f"IMDB Score Distribution for {selected_genre}")
     histogram_fig = px.histogram(
         filtered_data,
         x="IMDB Score",
         nbins=20,
         color_discrete_sequence=px.colors.qualitative.Pastel,
-        title=f"IMDB Score Distribution for {selected_genre}",
     )
+    st.plotly_chart(histogram_fig, use_container_width=True)
 
-    # Bar Chart
-    barchart_fig = px.bar(
-        filtered_data.groupby("Language").size().sort_values(ascending=False).reset_index(name="Count"),
-        x="Language",
-        y="Count",
-        title=f"Number of Movies in Each Language for {selected_genre}",
-        color="Language",
-        color_discrete_sequence=px.colors.qualitative.Pastel,
-    )
-    barchart_fig.update_traces(showlegend=False)
+# Bar Chart
+st.subheader(f"Number of Movies in Each Language for {selected_genre}")
+barchart_fig = px.bar(
+    filtered_data.groupby("Language").size().sort_values(ascending=False).reset_index(name="Count"),
+    x="Language",
+    y="Count",
+    color="Language",
+    color_discrete_sequence=px.colors.qualitative.Pastel,
+)
+barchart_fig.update_traces(showlegend=False)
+st.plotly_chart(barchart_fig, use_container_width=True)
 
-    # Boxplot
-    boxplot_fig = px.box(
-        filtered_data,
-        x="Premiere Year",
-        y="Runtime",
-        color="Premiere Year",
-        color_discrete_sequence=px.colors.qualitative.Pastel,
-        title=f"Runtime Distribution for {selected_genre}",
-    )
-    boxplot_fig.update_traces(showlegend=False)
+# Boxplot
+st.subheader(f"Runtime Distribution for {selected_genre}")
+boxplot_fig = px.box(
+    filtered_data,
+    x="Premiere Year",
+    y="Runtime",
+    color="Premiere Year",
+    color_discrete_sequence=px.colors.qualitative.Pastel,
+)
+boxplot_fig.update_traces(showlegend=False)
+st.plotly_chart(boxplot_fig, use_container_width=True)
 
-    return scatter_fig, histogram_fig, barchart_fig, boxplot_fig
-
+# Data Table
+st.subheader("Netflix Top Ten Data")
+st.dataframe(filtered_data)
 
 # Run app (for local execution)
 if __name__ == "__main__":
