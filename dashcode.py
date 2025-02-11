@@ -3,7 +3,7 @@ import plotly.express as px
 import streamlit as st
 
 # Load dataset
-n_topten = pd.read_csv('netflixtopten.csv')
+n_topten = pd.read_csv('netflixtoptenfiltered.csv')
 
 # Streamlit App Configuration
 st.set_page_config(page_title="Netflix Data Dashboard", layout="wide")
