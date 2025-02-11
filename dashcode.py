@@ -9,7 +9,7 @@ n_topten = pd.read_csv('netflixtoptenfiltered.csv')
 st.set_page_config(page_title="Netflix Data Dashboard", layout="wide")
 
 # Title
-st.title("📊 Netflix Data Dashboard")
+st.title("Netflix Data Dashboard")
 
 # Sidebar for Genre Selection
 st.sidebar.header("Filter Options")
@@ -79,4 +79,4 @@ st.dataframe(filtered_data)
 
 # Run app (for local execution)
 if __name__ == "__main__":
-    app.run(debug=True, port=8050)
+    pass
